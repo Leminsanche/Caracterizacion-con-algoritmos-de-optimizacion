@@ -1,0 +1,127 @@
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import interpolate
+
+
+nombres = ['rat8_tor1_long_aj.txt','rat8_tor2_long_aj.txt','rat9_tor1_long_aj.txt','rat9_tor2_long_aj.txt',
+           'rat10_tor1_long_aj.txt','rat10_tor2_long_aj.txt','rat11_tor1_long_aj.txt','rat11_tor2_long_aj.txt',
+           'rat12_tor_long.txt', 'rat13_tor1_long_aj.txt','rat13_tor2_long_aj.txt']
+
+nombres = ['rat8_tor1_long_aj.txt','rat8_tor2_long_aj.txt','rat9_tor1_long_aj.txt','rat9_tor2_long_aj.txt',
+           'rat10_tor1_long_aj.txt','rat10_tor2_long_aj.txt','rat11_tor1_long_aj.txt','rat11_tor2_long_aj.txt',
+           'rat13_tor1_long_aj.txt','rat13_tor2_long_aj.txt']
+
+
+sigmas = []
+landas = []
+n = 3000
+for i in nombres:    
+    texto = 'Datos Control/' + i
+    Datos = np.loadtxt(texto)
+    landa = Datos[:,0]
+    sigma_cauchy = Datos[:,1]
+    
+    mini = min(landa)
+    maxi = max(landa)
+    
+    X_n = np.linspace(mini,maxi,n)
+    f = interpolate.interp1d(landa, sigma_cauchy)
+    Y_n = f(X_n)
+    
+    landas.append(X_n)
+    sigmas.append(Y_n)
+    
+    plt.plot(landa,sigma_cauchy,label = i[:-4])
+
+
+aux = np.zeros((n, len(nombres)))
+aux2 = np.zeros((n, len(nombres)))
+it = 0
+for i in sigmas:
+    aux[:len(i),it] = i
+    it = it +1 
+    
+it = 0
+for i in landas:
+    aux2[:len(i),it] = i
+    it = it +1 
+    
+midx1 = [np.mean(aux2[i,:]) for i in range(n)]
+midy1 = [np.mean(aux[i,:]) for i in range(n)]
+DS1 = [np.std(aux[i,:]) for i in range(n)]
+
+
+plt.plot(midx1,midy1,'-.k',label = 'Curva Promedio')
+plt.ylabel(r'Esfuerzo de Cauchy $\sigma$[MPa]')
+plt.xlabel(r'Alargamiento  $\epsilon [\frac{mm}{mm}]$')
+plt.title('Datos Control')
+plt.legend()
+plt.grid()
+plt.show()
+
+aux = np.zeros((n,2))
+aux[:,0] = midx1
+aux[:,1] = midy1
+np.savetxt('Promedio Control.txt', aux)
+
+nombres = ['rat1_tor_long.txt','rat2_tor_long.txt','rat3_tor_long.txt','rat4_tor_long.txt','rat5_tor_long.txt']
+
+
+sigmas = []
+landas = []
+n = 3000
+for i in nombres:    
+    texto = 'Datos Hipoxia/' + i
+    Datos = np.loadtxt(texto)
+    landa = Datos[:,0]
+    sigma_cauchy = Datos[:,1]
+    
+    mini = min(landa)
+    maxi = max(landa)
+    
+    X_n = np.linspace(mini,maxi,n)
+    f = interpolate.interp1d(landa, sigma_cauchy)
+    Y_n = f(X_n)
+    
+    landas.append(X_n)
+    sigmas.append(Y_n)
+    
+    plt.plot(landa,sigma_cauchy,label = i[:-4])
+
+
+aux = np.zeros((n, len(nombres)))
+aux2 = np.zeros((n, len(nombres)))
+it = 0
+for i in sigmas:
+    aux[:len(i),it] = i
+    it = it +1 
+    
+it = 0
+for i in landas:
+    aux2[:len(i),it] = i
+    it = it +1 
+    
+midx2 = [np.mean(aux2[i,:]) for i in range(n)]
+midy2 = [np.mean(aux[i,:]) for i in range(n)]
+DS2 = [np.std(aux[i,:]) for i in range(n)]
+
+plt.plot(midx2,midy2,'-.k',label = 'Curva Promedio')
+plt.ylabel(r'Esfuerzo de Cauchy $\sigma$[MPa]')
+plt.xlabel(r'Alargamiento  $\epsilon [\frac{mm}{mm}]$')
+plt.title('Datos Hipoxia')
+plt.legend()
+plt.grid()
+plt.show()
+
+aux = np.zeros((n,2))
+aux[:,0] = midx2
+aux[:,1] = midy2
+np.savetxt('Promedio Hipoxia.txt', aux)
+
+plt.errorbar(midx1, midy1, DS1,fmt = '-ob',ecolor = 'r',elinewidth = 0.6, capsize =5)
+plt.errorbar(midx2, midy2, DS2,fmt = '-og',ecolor = 'k',elinewidth = 0.6, capsize =5)
+plt.ylabel(r'Esfuerzo de Cauchy $\sigma$[MPa]')
+plt.xlabel(r'Alargamiento  $\epsilon [\frac{mm}{mm}]$')
+plt.legend(['Datos Control','Datos Hipoxia'])
+plt.grid()
+plt.show()
